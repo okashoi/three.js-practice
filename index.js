@@ -1,24 +1,27 @@
 window.addEventListener('DOMContentLoaded', init);
 
 function init() {
+    var screenWidth = 800;
+    var screenHeight = 600;
+
     var renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(screenWidth, screenHeight);
     document.body.appendChild(renderer.domElement);
 
-    var angleOfView = 75;
-    var aspectRatio = window.innerWidth / window.innerHeight;
-    var nearClip = 0.1;
-    var farClip = 1000;
+    var angleOfView = 45;
+    var aspectRatio = screenWidth / screenHeight;
+    var nearClip = 1;
+    var farClip = 10000;
     var camera = new THREE.PerspectiveCamera(angleOfView, aspectRatio, nearClip, farClip);
     camera.position.set(0, 0, 1000);
 
 
     var scene = new THREE.Scene();
 
-    var width = 500;
-    var height = 500;
-    var depth = 500;
-    var cubeGeometry = new THREE.BoxGeometry(width, height, depth);
+    var cubeWidth = 500;
+    var cubeHeight = 500;
+    var cubeDepth = 500;
+    var cubeGeometry = new THREE.BoxGeometry(cubeWidth, cubeHeight, cubeDepth);
     var cubeMaterial = new THREE.MeshPhongMaterial({ color: 0x0080ff });
     var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
     scene.add(cube);
@@ -27,5 +30,15 @@ function init() {
     scene.add(light);
     light.position.set(1, 1, 1);
 
-    renderer.render(scene, camera);
+
+    tick();
+
+    function tick() {
+        requestAnimationFrame(tick);
+
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.01;
+
+        renderer.render(scene, camera);
+    }
 }
