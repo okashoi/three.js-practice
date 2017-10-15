@@ -1,6 +1,8 @@
 window.addEventListener('DOMContentLoaded', init);
+window.addEventListener('mousemove', onWindowMousemove);
+window.addEventListener('mousedown', onWindowMousedown);
 
-var renderer, scene, camera, light;
+var renderer, scene, camera, light, mouse, raycaster;
 var meshes = {};
 var states = {theta: 0};
 
@@ -66,6 +68,10 @@ function init() {
     light = new THREE.DirectionalLight(0xffffff);
     scene.add(light);
     light.position.set(0, 0, 200);
+    // mouse
+    mouse = new THREE.Vector2();
+    // raycaster
+    raycaster = new THREE.Raycaster();
 
     //----------------
     // put 3D objects
@@ -101,5 +107,22 @@ function init() {
 
         // re-render
         renderer.render(scene, camera);
+    }
+}
+
+function onWindowMousemove (event) {
+    mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
+    mouse.y = - (event.clientY / renderer.domElement.clientHeight) * 2 + 1;
+}
+
+function onWindowMousedown (event) {
+    if (event.target != renderer.domElement) {
+        return true;
+    }
+
+    raycaster.setFromCamera(mouse, camera);
+
+    if (raycaster.intersectObjects(scene.children).length > 0) {
+        alert('clicked');
     }
 }
