@@ -55,7 +55,7 @@ function init() {
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(screenWidth, screenHeight);
     renderer.setClearColor(0xffffff, 1.0);
-    document.body.appendChild(renderer.domElement);
+    document.getElementsByClassName('render-area')[0].appendChild(renderer.domElement);
     // scene
     scene = new THREE.Scene();
     // camera
@@ -110,12 +110,12 @@ function init() {
     }
 }
 
-function onWindowMousemove (event) {
+function onWindowMousemove(event) {
     mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
     mouse.y = - (event.clientY / renderer.domElement.clientHeight) * 2 + 1;
 }
 
-function onWindowMousedown (event) {
+function onWindowMousedown(event) {
     if (event.target != renderer.domElement) {
         return true;
     }
