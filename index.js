@@ -106,9 +106,9 @@ function init() {
     var screenWidth = window.innerWidth;
     var screenHeight = window.innerHeight;
     // camera
-    var angleOfView = 75;
+    var angleOfView = 45;
     var nearClip = 1;
-    var farClip = 210;
+    var farClip = 260;
 
     // objects
     // tower
@@ -118,7 +118,7 @@ function init() {
     var floorYDistance = 10;
     var floorThetaDistance = Math.PI / 7;
 
-    var angularVelocity = Math.PI / 1080;
+    var angularVelocity = - Math.PI / 2160;
 
     //-------
     // setup
@@ -133,7 +133,7 @@ function init() {
     // camera
     var aspectRatio = screenWidth / screenHeight;
     camera = new THREE.PerspectiveCamera(angleOfView, aspectRatio, nearClip, farClip);
-    camera.position.set(0, 0, -100);
+    camera.position.set(0, 0, -50);
 
 
     //----------------
