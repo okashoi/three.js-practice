@@ -1,5 +1,5 @@
 var THREE = require('three');
-import {TweenMax, Back} from "gsap";
+import {TweenMax, Power2} from "gsap";
 
 window.addEventListener('DOMContentLoaded', init);
 
@@ -8,8 +8,7 @@ var states = {
     theta: 0,
     scrollTop: 0,
     transforming: false,
-    progress: 0.0,
-    c: 0.0
+    progress: 0.0
 };
 
 // watching scroll amount with interval
@@ -20,10 +19,10 @@ var intervalId = setInterval(function () {
     if (!states.transforming && states.scrollTop > 500) {
         TweenMax.to(
             states,
-            1.5,
+            2,
             {
                 progress: 1.0,
-                ease: Back.easeOut.config(1.4),
+                ease: Power2.easeInOut,
                 onStart: function () {states.transforming = true;},
                 onComplete: function () {states.transforming = false;}
             }
@@ -33,10 +32,10 @@ var intervalId = setInterval(function () {
     if (!states.transforming && states.scrollTop < 500) {
         TweenMax.to(
             states,
-            1.5,
+            2,
             {
                 progress: 0.0,
-                ease: Back.easeOut.config(1.4),
+                ease: Power2.easeInOut,
                 onStart: function () {states.transforming = true;},
                 onComplete: function () {states.transforming = false;}
             }
@@ -64,17 +63,16 @@ Particle.prototype.updatePosition = function () {
     var y2 = this.transformedPosition.y;
     var z2 = this.transformedPosition.z;
 
-    this.mesh.position.x = x1 * (1 - states.c) + x2 * states.c;
-    this.mesh.position.y = y1 * (1 - states.c) + y2 * states.c;
-    this.mesh.position.z = z1 * (1 - states.c) + z2 * states.c;
+    this.mesh.position.x = x1 * (1 - states.progress) + x2 * states.progress;
+    this.mesh.position.y = y1 * (1 - states.progress) + y2 * states.progress;
+    this.mesh.position.z = z1 * (1 - states.progress) + z2 * states.progress;
 };
 
 var Ring = function (radius, particlesCount, offsetY, offsetTheta) {
     this.particles = [];
     for (var i = 0; i < particlesCount; i++) {
         var theta = 2 * Math.PI / particlesCount * i + offsetTheta;
-        // var transformedPosition = {x: (i - (particlesCount - 1) / 2) * 30, y: offsetY, z: -100};
-        var transformedPosition = {x: (i - (particlesCount - 1) / 2), y: -100, z: -200};
+        var transformedPosition = {x: 0, y: 0, z: -1100};
         this.particles.push(new Particle(radius, offsetY, theta, transformedPosition));
     }
 };
@@ -90,8 +88,9 @@ var Tower = function (radius, floorsCount, ringParticlesCount, floorYDistance, f
     var height = floorYDistance * (floorsCount - 1);
     for (var i = 0; i < floorsCount; i++) {
         var y = floorYDistance * i - height / 2;
+        var r = Math.sqrt(Math.max(radius * radius - y * y, 0));
         var theta = floorThetaDistance * i;
-        this.rings.push(new Ring(radius, ringParticlesCount, y, theta));
+        this.rings.push(new Ring(r, ringParticlesCount, y, theta));
     }
 };
 
@@ -99,23 +98,6 @@ Tower.prototype.update = function () {
     this.rings.map(function (ring) {
         ring.update();
     });
-};
-
-var ContentSphere = function (radius, originalPosition, transformedPosition) {
-    this.material = new THREE.MeshLambertMaterial({color: 0x888888});
-    this.geometry = new THREE.SphereGeometry(radius, 64, 64);
-    this.originalPosition = originalPosition;
-    this.transformedPosition = transformedPosition;
-    this.mesh = new THREE.Mesh(this.geometry, this.material);
-    this.mesh.position.x = this.originalPosition.x;
-    this.mesh.position.y = this.originalPosition.y;
-    this.mesh.position.z = this.originalPosition.z;
-};
-
-ContentSphere.prototype.update = function () {
-    this.mesh.position.x = this.originalPosition.x * (1 - states.c) + this.transformedPosition.x * states.c;
-    this.mesh.position.y = this.originalPosition.y * (1 - states.c) + this.transformedPosition.y * states.c;
-    this.mesh.position.z = this.originalPosition.z * (1 - states.c) + this.transformedPosition.z * states.c;
 };
 
 function init() {
@@ -128,7 +110,7 @@ function init() {
     // camera
     var angleOfView = 45;
     var nearClip = 1;
-    var farClip = 260;
+    var farClip = 900;
 
     // objects
     // tower
@@ -166,13 +148,9 @@ function init() {
         });
     });
 
-    var contents = [];
-    contents.push(new ContentSphere(16, {x: 0, y: -200, z: -500}, {x: 0, y: 0, z: -230}));
-    contents.push(new ContentSphere(16, {x: 60, y: -200, z: -500}, {x: 50, y: 0, z: -230}));
-    contents.push(new ContentSphere(16, {x: -60, y: -200, z: -500}, {x: -50, y: 0, z: -230}));
-    contents.map(function (content) {
-        scene.add(content.mesh);
-    });
+    tower.rings[12].particles[0].transformedPosition = {x: 0, y: 0, z: -230};
+    tower.rings[15].particles[6].transformedPosition = {x: 50, y: 0, z: -230};
+    tower.rings[18].particles[12].transformedPosition = {x: -50, y: 0, z: -230};
 
     draw();
     function draw() {
@@ -180,14 +158,9 @@ function init() {
 
         // update global states
         states.theta = (states.theta + angularVelocity) % (2 * Math.PI);
-        states.c = Math.atan(states.progress * 2 - 1) * 2 / Math.PI + 0.5;
 
         // update 3D objects states
         tower.update();
-
-        contents.map(function (content) {
-            content.update();
-        });
 
         // re-render
         renderer.render(scene, camera);
