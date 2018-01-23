@@ -44,12 +44,14 @@ var intervalId = setInterval(function () {
 }, 300);
 
 var Particle = function (orbitalRadius, offsetY, offsetTheta, transformedPosition) {
-    this.material = new THREE.MeshLambertMaterial({color: 0x888888});
+    this.material = new THREE.MeshLambertMaterial({color: 0x888888, opacity: 1, transparent: true});
     this.geometry = new THREE.SphereGeometry(2, 8, 8);
     this.orbitalRadius = orbitalRadius;
     this.offsetY = offsetY;
     this.offsetTheta = offsetTheta;
     this.transformedPosition = transformedPosition;
+    this.originalOpacity = 1;
+    this.transformedOpacity = 0;
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.position.y = offsetY;
 };
@@ -66,6 +68,7 @@ Particle.prototype.updatePosition = function () {
     this.mesh.position.x = x1 * (1 - states.progress) + x2 * states.progress;
     this.mesh.position.y = y1 * (1 - states.progress) + y2 * states.progress;
     this.mesh.position.z = z1 * (1 - states.progress) + z2 * states.progress;
+    this.mesh.material.opacity = this.originalOpacity * (1 - states.progress) * (1 - states.progress) + this.transformedOpacity * states.progress * states.progress;
 };
 
 var Ring = function (radius, particlesCount, offsetY, offsetTheta) {
@@ -110,7 +113,7 @@ function init() {
     // camera
     var angleOfView = 45;
     var nearClip = 1;
-    var farClip = 900;
+    var farClip = 1000;
 
     // objects
     // tower
@@ -149,8 +152,11 @@ function init() {
     });
 
     tower.rings[12].particles[0].transformedPosition = {x: 0, y: 0, z: -230};
+    tower.rings[12].particles[0].transformedOpacity = 1;
     tower.rings[15].particles[6].transformedPosition = {x: 50, y: 0, z: -230};
+    tower.rings[15].particles[6].transformedOpacity = 1;
     tower.rings[18].particles[12].transformedPosition = {x: -50, y: 0, z: -230};
+    tower.rings[18].particles[12].transformedOpacity = 1;
 
     draw();
     function draw() {
