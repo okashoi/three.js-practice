@@ -1,3 +1,5 @@
+var THREE = require('three');
+
 window.addEventListener('DOMContentLoaded', init);
 
 var renderer, scene, camera;

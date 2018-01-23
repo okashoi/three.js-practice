@@ -1,0 +1,23 @@
+{
+  "name": "threejs-practice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "source/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/okashoi/three.js-practice.git"
+  },
+  "author": "Shohei Okada",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/okashoi/three.js-practice/issues"
+  },
+  "homepage": "https://github.com/okashoi/three.js-practice#readme",
+  "dependencies": {
+    "three": "^0.89.0",
+    "webpack": "^3.10.0"
+  }
+}
