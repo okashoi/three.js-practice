@@ -1,5 +1,5 @@
 var THREE = require('three');
-import TweenMax from "gsap";
+import {TweenMax, Back} from "gsap";
 
 window.addEventListener('DOMContentLoaded', init);
 
@@ -20,9 +20,10 @@ var intervalId = setInterval(function () {
     if (!states.transforming && states.scrollTop > 500) {
         TweenMax.to(
             states,
-            1.0,
+            1.5,
             {
                 progress: 1.0,
+                ease: Back.easeOut.config(1.4),
                 onStart: function () {states.transforming = true;},
                 onComplete: function () {states.transforming = false;}
             }
@@ -32,9 +33,10 @@ var intervalId = setInterval(function () {
     if (!states.transforming && states.scrollTop < 500) {
         TweenMax.to(
             states,
-            1.0,
+            1.5,
             {
                 progress: 0.0,
+                ease: Back.easeOut.config(1.4),
                 onStart: function () {states.transforming = true;},
                 onComplete: function () {states.transforming = false;}
             }
