@@ -1,4 +1,5 @@
 var THREE = require('three');
+import TweenMax from "gsap";
 
 window.addEventListener('DOMContentLoaded', init);
 
@@ -7,7 +8,6 @@ var states = {
     theta: 0,
     scrollTop: 0,
     transforming: false,
-    transformed: false,
     progress: 0.0,
     c: 0.0
 };
@@ -17,12 +17,28 @@ var rootDocumentElement = document.documentElement;
 
 var intervalId = setInterval(function () {
     states.scrollTop = rootDocumentElement.scrollTop;
-    if (!states.transformed && !states.transforming && states.scrollTop > 500) {
-        states.transforming = true;
+    if (!states.transforming && states.scrollTop > 500) {
+        TweenMax.to(
+            states,
+            1.0,
+            {
+                progress: 1.0,
+                onStart: function () {states.transforming = true;},
+                onComplete: function () {states.transforming = false;}
+            }
+        );
     }
 
-    if (states.transformed && !states.transforming && states.scrollTop < 500) {
-        states.transforming = true;
+    if (!states.transforming && states.scrollTop < 500) {
+        TweenMax.to(
+            states,
+            1.0,
+            {
+                progress: 0.0,
+                onStart: function () {states.transforming = true;},
+                onComplete: function () {states.transforming = false;}
+            }
+        );
     }
 }, 300);
 
@@ -162,24 +178,6 @@ function init() {
 
         // update global states
         states.theta = (states.theta + angularVelocity) % (2 * Math.PI);
-
-        if (states.transforming && !states.transformed) {
-            states.progress += 0.03;
-
-            if (states.progress >= 1.0) {
-                states.progress = 1.0;
-                states.transforming = false;
-                states.transformed = true;
-            }
-        } else if (states.transforming && states.transformed) {
-            states.progress -= 0.03;
-
-            if (states.progress <= 0.0) {
-                states.progress = 0.0;
-                states.transforming = false;
-                states.transformed = false;
-            }
-        }
         states.c = Math.atan(states.progress * 2 - 1) * 2 / Math.PI + 0.5;
 
         // update 3D objects states
